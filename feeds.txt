@@ -1,0 +1,32 @@
+London|EN|BBC News London|https://feeds.bbci.co.uk/news/england/london/rss.xml
+London|EN|Evening Standard|https://www.standard.co.uk/news/london/rss
+London|EN|London Centric|https://www.londoncentric.media/feed
+London|EN|Secret London|https://secretldn.com/feed/
+UK|EN|BBC News UK|https://feeds.bbci.co.uk/news/uk/rss.xml
+UK|EN|The Guardian|https://www.theguardian.com/uk-news/rss
+UK|EN|Sky News|https://feeds.skynews.com/feeds/rss/uk.xml
+UK|EN|The Independent|https://www.independent.co.uk/news/uk/rss
+UK|EN|Channel 4 News|https://www.channel4.com/news/feed
+UK|EN|The Week UK|https://theweek.com/uk/feeds.xml
+World|EN|Reuters|https://news.google.com/rss/search?q=site:reuters.com+world+when:1d&hl=en-GB&gl=GB&ceid=GB:en
+World|EN|Al Jazeera|https://www.aljazeera.com/xml/rss/all.xml
+World|EN|France 24|https://www.france24.com/en/rss
+World|FR|France 24|https://www.france24.com/fr/rss
+World|EN|Euronews|https://www.euronews.com/rss?format=mrss&level=theme&name=news
+World|FR|Euronews|https://fr.euronews.com/rss?format=mrss&level=theme&name=news
+World|ES|Euronews|https://es.euronews.com/rss?format=mrss&level=theme&name=news
+World|EN|El País|https://feeds.elpais.com/mrss-s/pages/ep/site/english.elpais.com/portada
+World|ES|El País|https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada
+Balkans|EN|Balkan Insight|https://balkaninsight.com/feed/
+Balkans|EN|Tirana Times|https://www.tiranatimes.com/?feed=rss2
+# Balkans|SQ|Top Channel| (blocks automated reading; replace with an Albanian-language feed once its domain is allowed)
+Balkans|EN|Albanian Daily News|https://news.google.com/rss/search?q=site:albaniandailynews.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en
+Marketing|EN|Social Media Today|https://www.socialmediatoday.com/feeds/news/
+Marketing|EN|The Drum|https://news.google.com/rss/search?q=site:thedrum.com+when:7d&hl=en-GB&gl=GB&ceid=GB:en
+Marketing|EN|Marketing Beat|https://www.marketing-beat.co.uk/feed/
+Marketing|EN|Think with Google|https://news.google.com/rss/search?q=site:thinkwithgoogle.com&hl=en-GB&gl=GB&ceid=GB:en
+Marketing|EN|HubSpot Marketing Blog|https://blog.hubspot.com/marketing/rss.xml
+Tech|EN|The Verge|https://www.theverge.com/rss/index.xml
+Tech|EN|BBC Technology|https://feeds.bbci.co.uk/news/technology/rss.xml
+Tech|EN|TechCrunch|https://techcrunch.com/feed/
+Tech|EN|Platformer|https://www.platformer.news/rss/

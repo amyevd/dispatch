@@ -1,0 +1,523 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><title>Dispatch</title><meta name="robots" content="noindex"></head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,800&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#131313;
+    --tile:#262626;
+    --tile-2:#2F2F2F;
+    --fg:#FFFFFF;
+    --muted:#A3A3A3;
+    --pink:#FF4FA3;
+    --lime:#C6FF3D;
+    --on-color:#0B0B0B;
+    --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+    --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{background:var(--bg)}
+  body{color:var(--fg);font-family:var(--display);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:0 56px}
+  .wrap{max-width:1240px;margin:0 auto;display:grid;gap:20px}
+  .label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .muted{color:var(--muted)}
+
+  .top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 20px;padding-block:14px;border-bottom:1px solid #333}
+
+  .mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+  .mast h1{margin:0;font-weight:800;text-transform:uppercase;font-size:clamp(3.6rem,13vw,10.5rem);line-height:.82;letter-spacing:-.05em}
+  .mast h1 span{color:var(--pink)}
+  .mast p{margin:0;max-width:24ch}
+
+  .sample{background:var(--tile);border-radius:14px;padding:10px 16px}
+  .sample b{color:var(--lime)}
+
+  .filters{display:flex;flex-wrap:wrap;gap:8px}
+  .filters button{
+    font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;
+    background:transparent;color:var(--fg);border:1.5px solid var(--fg);border-radius:999px;padding:8px 16px;
+    transition:background .15s, color .15s, border-color .15s;
+  }
+  .filters button:hover{background:var(--tile-2)}
+  .filters button[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--on-color)}
+  .filters button:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+
+  .langs[hidden]{display:none}
+  .langs{display:flex;flex-wrap:wrap;gap:0;justify-self:start;border:1.5px solid var(--pink);border-radius:999px;overflow:hidden}
+  .langs button{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;cursor:pointer;background:transparent;color:var(--fg);border:0;padding:8px 16px}
+  .langs button[aria-pressed="true"]{background:var(--pink);color:var(--on-color)}
+  .langs button:focus-visible{outline:2px solid var(--lime);outline-offset:-4px}
+  .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  @media (max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:560px){.grid{grid-template-columns:1fr}}
+
+  .tile{background:var(--tile);border-radius:24px;padding:22px;display:grid;gap:12px;align-content:start;transition:transform .15s}
+  .tile:hover{transform:translateY(-2px)}
+  .tile .meta{display:flex;justify-content:space-between;gap:10px}
+  .tile h3{margin:0;font-weight:800;font-size:1.35rem;line-height:1.02;letter-spacing:-.02em;text-wrap:balance}
+  .tile p{margin:0;color:var(--muted);font-size:15px}
+  .tile .src{margin-top:auto}
+  a.tile{color:inherit;text-decoration:none}
+  a.tile:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+  .tile h3,.tile h2{overflow-wrap:anywhere}
+
+  .tile.lead{grid-column:span 2;grid-row:span 2;background:var(--pink);color:var(--on-color);padding:30px;align-content:space-between;min-height:340px}
+  .tile.lead h2{margin:0;font-weight:800;text-transform:uppercase;font-size:clamp(2.2rem,4.6vw,4rem);line-height:.9;letter-spacing:-.04em;text-wrap:balance}
+  .tile.lead p{color:#2A0A1A;font-size:17px;max-width:44ch}
+  .tile.lead .muted{color:#3A0F25}
+  .tile.hot{background:var(--lime);color:var(--on-color)}
+  .tile.hot p,.tile.hot .muted{color:#253300}
+  @media (max-width:560px){.tile.lead{grid-column:auto;grid-row:auto;min-height:0}}
+
+  .empty{grid-column:1/-1;background:var(--tile);border-radius:24px;padding:24px}
+
+  footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-top:1px solid #333;padding-top:12px}
+  @media (prefers-reduced-motion:reduce){.tile,.filters button{transition:none}.tile:hover{transform:none}}
+
+  /* Today: schedule + to-do */
+  .today{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:12px}
+  @media (max-width:760px){.today{grid-template-columns:1fr}}
+  .tpanel{background:var(--tile);border-radius:24px;padding:22px;display:grid;gap:10px;align-content:start}
+  .thead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 12px}
+  .thead h2{margin:0;color:var(--lime);font-weight:700}
+  .thead .actions{display:flex;gap:12px;align-items:baseline}
+  .linkbtn{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;background:none;border:0;color:var(--muted);cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+  .linkbtn:hover{color:var(--fg)}
+  .linkbtn:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+  .checks{list-style:none;margin:0;padding:0}
+  .checks li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:14px;align-items:start;padding:12px 0;border-top:1px solid #363636}
+  .checks li:first-child{border-top:0}
+  .checks li.note{display:block;color:var(--muted);font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  .box{appearance:none;-webkit-appearance:none;width:22px;height:22px;margin:1px 0 0;border:1.5px solid var(--fg);border-radius:6px;background:transparent;cursor:pointer;display:grid;place-content:center;transition:background .12s,border-color .12s}
+  .box:hover{background:var(--tile-2)}
+  .box:checked{background:var(--lime);border-color:var(--lime)}
+  .box:checked::after{content:"";width:10px;height:5px;border:solid var(--on-color);border-width:0 0 2.5px 2.5px;transform:translateY(-1px) rotate(-45deg)}
+  .box:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+  .it{display:grid;gap:2px;cursor:pointer}
+  .it-t{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+  .it-n{font-size:17px;font-weight:500;line-height:1.25;overflow-wrap:anywhere}
+  li.now .it-t{color:var(--pink)}
+  li.now .it-t::after{content:" · now"}
+  li.done .it-n{text-decoration:line-through;text-decoration-thickness:2px;color:var(--muted)}
+  li.past:not(.done) .it-n{color:#D4D4D4}
+  .side{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;background:none;border:0;cursor:pointer;padding:2px 4px;line-height:1.4}
+  .side:hover{color:var(--fg)}
+  .side:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+  .addrow{display:flex;gap:8px;margin-top:4px}
+  .addrow input{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--fg);background:transparent;border:1.5px solid #4A4A4A;border-radius:999px;padding:9px 16px}
+  .addrow input::placeholder{color:var(--muted)}
+  .addrow input:focus{outline:none;border-color:var(--lime)}
+  .addrow button{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;background:var(--lime);color:var(--on-color);border:0;border-radius:999px;padding:9px 18px;cursor:pointer}
+  .addrow button:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+  .hint{margin:0;font-size:13px;color:var(--muted)}
+  .signin{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;background:var(--tile);border:1.5px solid var(--lime);border-radius:24px;padding:18px 22px}
+  .signin p{margin:0;font-size:16px}
+  .signin button{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;background:var(--lime);color:var(--on-color);border:0;border-radius:999px;padding:10px 20px;cursor:pointer}
+  .signin button:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+  .it-l{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  li.over .it-t{color:var(--pink)}
+  .checks li.sub{display:block;padding:14px 0 2px;border-top:0;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--pink)}
+  .checks li.sub + li{border-top:0}
+  @media (prefers-reduced-motion:reduce){.box{transition:none}}
+</style>
+
+<div class="wrap">
+  <div class="top label">
+    <span>London · <span id="edition">—</span></span>
+    <output id="clock">--:--</output>
+  </div>
+
+  <header class="mast">
+    <h1>Dispatch<span>.</span></h1>
+    <p class="label muted">A personal news front page for Amye Dyrmishi</p>
+  </header>
+
+  <div class="signin" id="signin" hidden>
+    <p id="signintext">Sign in with Google to see today's schedule and your tasks.</p>
+    <button type="button" id="signinbtn">Sign in with Google</button>
+  </div>
+
+  <section class="today" aria-label="Today">
+    <div class="tpanel">
+      <div class="thead">
+        <h2 class="label">Today's schedule</h2>
+        <span class="label muted" id="calmeta"></span>
+      </div>
+      <ul class="checks" id="events"><li class="note">Loading your calendar…</li></ul>
+    </div>
+    <div class="tpanel">
+      <div class="thead">
+        <h2 class="label">Google Tasks</h2>
+        <span class="actions"><span class="label muted" id="todometa"></span><button type="button" class="linkbtn" id="refresh" hidden>Refresh</button></span>
+      </div>
+      <ul class="checks" id="todos"></ul>
+      <form class="addrow" id="addtodo" autocomplete="off">
+        <input id="todoinput" maxlength="160" placeholder="Add a task" aria-label="New task">
+        <button type="submit">Add</button>
+      </form>
+      <p class="hint" id="todohint" hidden></p>
+    </div>
+  </section>
+
+  <div class="sample label" id="status"><b>Loading.</b> Fetching today's headlines…</div>
+
+  <nav class="filters" id="filters" aria-label="Filter by section"></nav>
+  <div class="langs" id="langtoggle" role="group" aria-label="Language" hidden></div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer class="label muted">
+    <span>Dispatch ®</span>
+    <span>Keys 1–7 switch sections · <button type="button" class="linkbtn" id="signout" hidden>Sign out of Google</button></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var DESKS = ["All","London","UK","World","Balkans","Marketing","Tech"];
+  var LANGDESKS = {World:"French & Spanish", Balkans:"Albanian"};
+  var TOP = {London:"BBC News London", UK:"BBC News UK", World:"Reuters", Balkans:"Balkan Insight", Marketing:"Social Media Today", Tech:"The Verge"};
+  var S = [], generated = null;
+  var active = "All", lang = "EN";
+  try{ var saved = localStorage.getItem("dispatch-desk"); if(saved && DESKS.indexOf(saved)>-1) active = saved; }catch(e){}
+  try{ var sl = localStorage.getItem("dispatch-lang"); if(sl==="EN"||sl==="NATIVE") lang = sl; }catch(e){}
+
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function ago(ts){
+    if(!ts) return "";
+    var m = Math.max(0, Math.round((Date.now()/1000 - ts)/60));
+    if(m<60) return m+" min ago"; var h=Math.round(m/60); if(h<48) return h+" hr ago"; return Math.round(h/24)+" days ago";
+  }
+  function isNative(s){ return s.l && s.l!=="EN"; }
+  function safeUrl(u){ return /^https?:\/\//i.test(u||"") ? u : "#"; }
+
+  var filters = document.getElementById("filters");
+  function renderFilters(){
+    filters.innerHTML = DESKS.map(function(d){
+      return '<button type="button" id="desk-'+d.toLowerCase()+'" data-d="'+d+'" aria-pressed="'+(d===active)+'">'+d+'</button>';
+    }).join("");
+  }
+  filters.addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(b) setDesk(b.getAttribute("data-d"));
+  });
+  document.getElementById("langtoggle").addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    lang = b.getAttribute("data-l");
+    try{ localStorage.setItem("dispatch-lang", lang); }catch(e){}
+    render();
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.target.matches && e.target.matches("input,textarea")) return;
+    var i = parseInt(e.key,10);
+    if(i>=1 && i<=DESKS.length) setDesk(DESKS[i-1]);
+  });
+  function setDesk(d){
+    active = d;
+    try{ localStorage.setItem("dispatch-desk", d); }catch(e){}
+    renderFilters(); render();
+  }
+
+  function byTime(a,b){ return (b.ts||0)-(a.ts||0); }
+  function pick(){
+    if(active==="All"){
+      // one story per English source, newest first; lead = BBC UK's top story
+      var bySrc = {}, out = [];
+      S.forEach(function(s){ if(!isNative(s) && !bySrc[s.src]){ bySrc[s.src]=1; out.push(s); } });
+      out.sort(byTime);
+      var li = out.findIndex(function(s){return s.src==="BBC News UK" && s.pos===0});
+      if(li>0){ out.unshift(out.splice(li,1)[0]); }
+      return out;
+    }
+    var list = S.filter(function(s){return s.d===active && (!LANGDESKS[active] || (lang==="EN" ? !isNative(s) : isNative(s)))});
+    list.sort(byTime);
+    var top = list.findIndex(function(s){return s.src===TOP[active] && s.pos===0});
+    if(top>0){ list.unshift(list.splice(top,1)[0]); }
+    return list;
+  }
+  function hot(s){ return s.pos===0 && TOP[s.d]===s.src; }
+
+  function render(){
+    var lt = document.getElementById("langtoggle");
+    if(LANGDESKS[active]){
+      lt.hidden = false;
+      lt.innerHTML = '<button type="button" id="lang-en" data-l="EN" aria-pressed="'+(lang==="EN")+'">English</button>'+
+        '<button type="button" id="lang-native" data-l="NATIVE" aria-pressed="'+(lang==="NATIVE")+'">'+LANGDESKS[active]+'</button>';
+    } else { lt.hidden = true; lt.innerHTML = ""; }
+    var list = pick(), lead = list[0], rest = list.slice(1);
+    var html = lead ? (
+      '<a class="tile lead" href="'+esc(safeUrl(lead.u))+'" target="_blank" rel="noopener"><div class="meta label"><span>'+esc(lead.d)+(isNative(lead)?' · '+esc(lead.l):'')+'</span><span class="muted">'+ago(lead.ts)+'</span></div>'+
+      '<h2>'+esc(lead.t)+'</h2>'+(lead.p?'<p>'+esc(lead.p)+'</p>':'')+'<span class="label muted">'+esc(lead.src)+' ↗</span></a>'
+    ) : '';
+    html += rest.length ? rest.map(function(s){
+      return '<a class="tile'+(hot(s)?' hot':'')+'" href="'+esc(safeUrl(s.u))+'" target="_blank" rel="noopener">'+
+        '<div class="meta label"><span>'+esc(s.d)+(isNative(s)?' · '+esc(s.l):'')+'</span><span class="muted">'+ago(s.ts)+'</span></div>'+
+        '<h3>'+esc(s.t)+'</h3>'+(s.p?'<p>'+esc(s.p)+'</p>':'')+
+        '<span class="src label muted">'+esc(s.src)+' ↗</span></a>';
+    }).join("") : (S.length ? '<div class="empty label muted">'+(list.length ? 'Nothing else in this section right now.' : (active==="Balkans" && lang!=="EN" ? 'No Albanian-language source connected yet.' : 'No stories in this section right now.'))+'</div>' : '');
+    document.getElementById("grid").innerHTML = html;
+  }
+
+  function tick(){
+    try{ document.getElementById("clock").textContent = new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/London",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date()); }catch(e){}
+  }
+  try{
+    document.getElementById("edition").textContent = new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/London",weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date());
+  }catch(e){}
+  tick(); setInterval(tick, 15000);
+
+  var status = document.getElementById("status");
+  renderFilters(); render();
+  fetch("news.json", {cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(d){
+      S = d.items || []; generated = d.generated;
+      var when = "";
+      try{ when = new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/London",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(generated*1000)); }catch(e){}
+      var srcs = {}; S.forEach(function(s){srcs[s.src+s.l]=1});
+      status.innerHTML = '<b>Updated '+esc(when)+'.</b> '+S.length+' stories from '+Object.keys(srcs).length+' feeds. Tap a story to read it at the source.';
+      render();
+    })
+    .catch(function(){
+      status.innerHTML = '<b>Couldn\'t load today\'s headlines.</b> Reload the page to try again.';
+    });
+})();
+</script>
+
+<script>
+/* ================================================================
+   Today: live Google Calendar + Google Tasks
+   ONE-TIME SETUP: paste your Google OAuth client ID below (see SETUP.md)
+   ================================================================ */
+var GOOGLE_CLIENT_ID = "PASTE-YOUR-CLIENT-ID-HERE.apps.googleusercontent.com";
+
+(function(){
+  var TZ = "Europe/London", CARRY_DAYS = 7;
+  var SCOPES = "https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/calendar.readonly";
+  var $ = function(id){ return document.getElementById(id); };
+  var elEv = $("events"), elCalMeta = $("calmeta"), elTasks = $("todos"), elTaskMeta = $("todometa");
+  var elHint = $("todohint"), form = $("addtodo"), input = $("todoinput");
+  var elSignin = $("signin"), elSigninText = $("signintext"), elSignout = $("signout"), elRefresh = $("refresh");
+
+  var day = londonDate(new Date());
+  var token = null, tokenClient = null;
+  var events = null, past = [], calNote = "Sign in to see today's schedule.";
+  var tasks = null, lists = [], taskNote = "Sign in to see your tasks.";
+  var ticks = lget("dispatch-ticks") || {}, justTicked = {};
+  var busy = {};
+
+  /* ---------- helpers ---------- */
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function lget(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ return null; } }
+  function lset(k,v){ try{ if(v==null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function londonDate(d){ try{ return new Intl.DateTimeFormat("en-CA",{timeZone:TZ,year:"numeric",month:"2-digit",day:"2-digit"}).format(d); }catch(e){ return d.toISOString().slice(0,10); } }
+  function londonOffset(d){
+    try{ var p = new Intl.DateTimeFormat("en-GB",{timeZone:TZ,timeZoneName:"longOffset"}).formatToParts(d);
+      var n = (p.find(function(x){return x.type==="timeZoneName"})||{}).value||"GMT"; var m = n.match(/([+-]\d{2}):?(\d{2})/); return m ? m[1]+":"+m[2] : "+00:00";
+    }catch(e){ return "+00:00"; }
+  }
+  function shiftDay(ymd,n){ var a = ymd.split("-").map(Number); return new Date(Date.UTC(a[0],a[1]-1,a[2]+n)).toISOString().slice(0,10); }
+  function hm(iso){ try{ return new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(iso)); }catch(e){ return ""; } }
+  function fmtDay(ymd){ try{ return new Intl.DateTimeFormat("en-GB",{timeZone:"UTC",weekday:"short",day:"numeric",month:"short"}).format(new Date(ymd+"T12:00:00Z")); }catch(e){ return ymd; } }
+  function safeUrl(u){ return /^https:\/\//i.test(u||"") ? u : ""; }
+  function showHint(t){ elHint.textContent = t||""; elHint.hidden = !t; }
+
+  /* ---------- sign-in (Google Identity Services, token in this browser only) ---------- */
+  var saved = lget("dispatch-google");
+  if(saved && saved.exp > Date.now()+60000) token = saved.t;
+
+  function configured(){ return GOOGLE_CLIENT_ID.indexOf("PASTE-YOUR")!==0; }
+  function setSignedIn(on, msg){
+    elSignin.hidden = on;
+    elSignout.hidden = !on;
+    elRefresh.hidden = !on;
+    form.hidden = !on;
+    if(!on){
+      elSigninText.textContent = msg || "Sign in with Google to see today's schedule and your tasks.";
+      events = null; past = []; tasks = null;
+      calNote = "Sign in to see today's schedule."; taskNote = "Sign in to see your tasks.";
+      render();
+    }
+  }
+  function initClient(){
+    if(tokenClient || !window.google || !google.accounts || !google.accounts.oauth2) return;
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID, scope: SCOPES,
+      callback: function(r){
+        if(r && r.access_token){
+          token = r.access_token;
+          lset("dispatch-google", {t: token, exp: Date.now() + (Number(r.expires_in)||3600)*1000});
+          setSignedIn(true); loadAll();
+        } else setSignedIn(false, "Google sign-in didn't finish. Try again.");
+      },
+      error_callback: function(){ setSignedIn(false, "Google sign-in was closed before it finished. Try again."); }
+    });
+  }
+  window.dispatchGisReady = function(){ initClient(); };
+  $("signinbtn").addEventListener("click", function(){
+    if(!configured()){ elSigninText.textContent = "Add your Google client ID to index.html first (step 3 in SETUP.md)."; return; }
+    initClient();
+    if(!tokenClient){ elSigninText.textContent = "Google sign-in is still loading. Try again in a moment."; return; }
+    tokenClient.requestAccessToken({prompt: lget("dispatch-google-seen") ? "" : "consent"});
+    lset("dispatch-google-seen", true);
+  });
+  elSignout.addEventListener("click", function(){
+    try{ if(token && window.google) google.accounts.oauth2.revoke(token, function(){}); }catch(e){}
+    token = null; lset("dispatch-google", null); lset("dispatch-google-seen", null);
+    setSignedIn(false, "Signed out. Sign in with Google to see today's schedule and your tasks.");
+  });
+  elRefresh.addEventListener("click", function(){ loadAll(); });
+
+  /* ---------- Google API calls ---------- */
+  function api(url, opts){
+    opts = opts || {};
+    return fetch(url, {method: opts.method||"GET", headers: Object.assign({"Authorization":"Bearer "+token}, opts.body?{"Content-Type":"application/json"}:{}),
+                       body: opts.body ? JSON.stringify(opts.body) : undefined})
+      .then(function(r){
+        if(r.status===401){ token = null; lset("dispatch-google", null); setSignedIn(false, "Your Google sign-in has expired. Sign in again to refresh."); throw {code:"auth"}; }
+        if(r.status===403) throw {code:"forbidden"};
+        if(!r.ok) throw {code:"http", status:r.status};
+        return r.status===204 ? null : r.json();
+      });
+  }
+  function calUrl(fromDay, toDay){
+    var off = londonOffset(new Date());
+    return "https://www.googleapis.com/calendar/v3/calendars/primary/events?singleEvents=true&orderBy=startTime&maxResults=250"+
+      "&timeMin="+encodeURIComponent(fromDay+"T00:00:00"+off)+"&timeMax="+encodeURIComponent(toDay+"T00:00:00"+off)+"&timeZone="+encodeURIComponent(TZ);
+  }
+  function loadCalendar(){
+    return Promise.all([api(calUrl(day, shiftDay(day,1))), api(calUrl(shiftDay(day,-CARRY_DAYS), day))])
+      .then(function(r){ events = (r[0] && r[0].items)||[]; past = (r[1] && r[1].items)||[]; renderEvents(); })
+      .catch(function(e){
+        if(e && e.code==="auth") return;
+        calNote = e && e.code==="forbidden" ? "Google Calendar access is off. Check the Calendar API is enabled (step 3 in SETUP.md)." : "Couldn't reach Google Calendar just now.";
+        if(!events) events = null; renderEvents();
+      });
+  }
+  function loadTasks(){
+    return api("https://tasks.googleapis.com/tasks/v1/users/@me/lists?maxResults=100").then(function(r){
+      lists = (r && r.items)||[];
+      return Promise.all(lists.map(function(l){
+        return api("https://tasks.googleapis.com/tasks/v1/lists/"+encodeURIComponent(l.id)+"/tasks?showCompleted=false&showHidden=false&maxResults=100")
+          .then(function(t){ return ((t && t.items)||[]).map(function(x){ x._list = l.id; x._listName = l.title; return x; }); });
+      }));
+    }).then(function(all){
+      var prev = {}; (tasks||[]).forEach(function(t){ if(t.status==="completed" && justTicked[t.id]) prev[t.id] = t; });
+      tasks = [].concat.apply([], all).filter(function(t){ return t.title && t.title.trim(); });
+      Object.keys(prev).forEach(function(id){ if(!tasks.some(function(t){return t.id===id})) tasks.push(prev[id]); });
+      renderTasks();
+    }).catch(function(e){
+      if(e && e.code==="auth") return;
+      taskNote = e && e.code==="forbidden" ? "Google Tasks access is off. Check the Tasks API is enabled (step 3 in SETUP.md)." : "Couldn't reach Google Tasks just now.";
+      tasks = null; renderTasks();
+    });
+  }
+  function loadAll(){ if(!token) return; loadCalendar(); loadTasks(); }
+
+  /* ---------- render: schedule ---------- */
+  function evRow(e, timeLabel, extraCls){
+    var id = "ev-"+esc(e.id), link = safeUrl(e.htmlLink);
+    return '<li class="'+[ticks[e.id]?"done":"", extraCls||""].join(" ")+'"><input type="checkbox" class="box" id="'+id+'" data-ev="'+esc(e.id)+'"'+(ticks[e.id]?" checked":"")+'>'+
+      '<label class="it" for="'+id+'"><span class="it-t">'+esc(timeLabel)+'</span><span class="it-n">'+esc(e.summary||"(No title)")+'</span></label>'+
+      (link ? '<a class="side" href="'+esc(link)+'" target="_blank" rel="noopener" aria-label="Open in Google Calendar">↗</a>' : '<span></span>')+'</li>';
+  }
+  function renderEvents(){
+    if(!events){ elEv.innerHTML = '<li class="note">'+esc(calNote)+'</li>'; elCalMeta.textContent = ""; return; }
+    var now = Date.now();
+    var list = events.filter(function(e){ return e && e.status!=="cancelled" && e.start; });
+    var carried = past.filter(function(e){ return e && e.id && e.status!=="cancelled" && e.start && !e.recurringEventId && (!ticks[e.id] || justTicked[e.id]); });
+    var html = "";
+    if(carried.length){
+      html += '<li class="sub">Carried over</li>' + carried.map(function(e){
+        var lbl = e.start.dateTime ? fmtDay(londonDate(new Date(e.start.dateTime)))+" · "+hm(e.start.dateTime) : fmtDay(e.start.date)+" · all day";
+        return evRow(e, lbl, "");
+      }).join("") + '<li class="sub">Today</li>';
+    }
+    html += list.length ? list.map(function(e){
+      var allDay = !e.start.dateTime, s = e.start.dateTime, en = e.end && e.end.dateTime, cls = "";
+      if(!allDay){ var st = Date.parse(s), et = en ? Date.parse(en) : st; cls = (st<=now && now<et) ? "now" : (et<=now ? "past" : ""); }
+      return evRow(e, allDay ? "All day" : hm(s)+(en?"–"+hm(en):""), cls);
+    }).join("") : '<li class="note">Nothing on the calendar today.</li>';
+    elEv.innerHTML = html;
+    var done = list.filter(function(e){return ticks[e.id]}).length;
+    elCalMeta.textContent = list.length ? done+"/"+list.length+" done" : "";
+  }
+  elEv.addEventListener("change", function(e){
+    var id = e.target.getAttribute && e.target.getAttribute("data-ev"); if(!id) return;
+    if(e.target.checked){ ticks[id] = day; justTicked[id] = true; } else delete ticks[id];
+    var cutoff = shiftDay(day,-30); Object.keys(ticks).forEach(function(k){ if(typeof ticks[k]==="string" && ticks[k]<cutoff) delete ticks[k]; });
+    lset("dispatch-ticks", ticks); renderEvents();
+  });
+
+  /* ---------- render: Google Tasks ---------- */
+  function dueInfo(t){
+    if(!t.due) return {rank: 2, label: "", over: false};
+    var d = t.due.slice(0,10);
+    if(d < day) return {rank: 0, label: "Overdue · "+fmtDay(d), over: true, d: d};
+    if(d === day) return {rank: 1, label: "Due today", over: false, d: d};
+    return {rank: 3, label: "Due "+fmtDay(d), over: false, d: d};
+  }
+  function renderTasks(){
+    if(!tasks){ elTasks.innerHTML = '<li class="note">'+esc(taskNote)+'</li>'; elTaskMeta.textContent = ""; return; }
+    var multi = lists.length > 1;
+    var rows = tasks.map(function(t){ return {t: t, d: dueInfo(t)}; }).sort(function(a,b){
+      return a.d.rank-b.d.rank || String(a.d.d||"").localeCompare(String(b.d.d||"")) || String(a.t.position||"").localeCompare(String(b.t.position||""));
+    });
+    elTasks.innerHTML = rows.length ? rows.map(function(r){
+      var t = r.t, id = "tk-"+esc(t.id), done = t.status==="completed";
+      var meta = [r.d.label, multi ? t._listName : ""].filter(Boolean).join(" · ");
+      return '<li class="'+(done?"done":"")+(r.d.over?" over":"")+'"><input type="checkbox" class="box" id="'+id+'" data-tk="'+esc(t.id)+'" data-list="'+esc(t._list)+'"'+(done?" checked":"")+(busy[t.id]?" disabled":"")+'>'+
+        '<label class="it" for="'+id+'">'+(meta?'<span class="it-t">'+esc(meta)+'</span>':'')+'<span class="it-n">'+esc(t.title)+'</span></label>'+
+        (safeUrl(t.webViewLink) ? '<a class="side" href="'+esc(t.webViewLink)+'" target="_blank" rel="noopener" aria-label="Open in Google Tasks">↗</a>' : '<span></span>')+'</li>';
+    }).join("") : '<li class="note">Nothing outstanding.</li>';
+    var open = tasks.filter(function(t){return t.status!=="completed"}).length;
+    elTaskMeta.textContent = open+" open";
+  }
+  elTasks.addEventListener("change", function(e){
+    var id = e.target.getAttribute && e.target.getAttribute("data-tk"); if(!id || !token) return;
+    var listId = e.target.getAttribute("data-list"), checked = e.target.checked;
+    var t = (tasks||[]).find(function(x){return x.id===id}); if(!t) return;
+    var before = t.status;
+    t.status = checked ? "completed" : "needsAction"; justTicked[id] = checked; busy[id] = true; renderTasks();
+    api("https://tasks.googleapis.com/tasks/v1/lists/"+encodeURIComponent(listId)+"/tasks/"+encodeURIComponent(id),
+        {method:"PATCH", body: checked ? {status:"completed"} : {status:"needsAction", completed:null}})
+      .then(function(){ busy[id] = false; showHint(""); renderTasks(); })
+      .catch(function(err){
+        busy[id] = false; if(err && err.code==="auth") return;
+        t.status = before; showHint("Couldn't update that task in Google. Try again."); renderTasks();
+      });
+  });
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = input.value.replace(/\s+/g," ").trim(); if(!v || !token) return;
+    input.disabled = true;
+    api("https://tasks.googleapis.com/tasks/v1/lists/@default/tasks", {method:"POST", body:{title: v}})
+      .then(function(){ input.value = ""; showHint(""); return loadTasks(); })
+      .catch(function(err){ if(!(err && err.code==="auth")) showHint("Couldn't add that to Google Tasks. Try again."); })
+      .then(function(){ input.disabled = false; input.focus(); });
+  });
+
+  function render(){ renderEvents(); renderTasks(); }
+
+  /* ---------- start ---------- */
+  render();
+  if(!configured()) setSignedIn(false, "Almost there: add your Google client ID to index.html (step 3 in SETUP.md), then sign in here.");
+  else if(token){ setSignedIn(true); loadAll(); }
+  else setSignedIn(false);
+
+  setInterval(function(){
+    var d = londonDate(new Date());
+    if(d !== day){ day = d; justTicked = {}; loadAll(); }
+    else if(token && document.visibilityState==="visible") loadAll();
+  }, 5*60000);
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState==="visible" && token){
+      var s = lget("dispatch-google");
+      if(!s || s.exp < Date.now()){ token = null; setSignedIn(false, "Your Google sign-in has expired. Sign in again to refresh."); }
+      else loadAll();
+    }
+  });
+})();
+</script>
+<script src="https://accounts.google.com/gsi/client" async onload="dispatchGisReady()"></script>
+
+</body></html>
